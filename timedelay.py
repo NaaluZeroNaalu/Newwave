@@ -82,6 +82,7 @@ def process_file(filestream, workbook):
             engine="openpyxl",
             header=0
         )
+        st.session_state.towername = "Tower 5"
         activity_names = [
             "Brickwork", "AC Installation", "Balconies Waterproofing", "Brick masonry for entrance wall",
             "C-F-First Fix", "C-Gypsum and POP Punning", "C-P-First Fix", "C-Stone flooring",
@@ -107,7 +108,8 @@ def process_file(filestream, workbook):
         sheet_name = "TOWER 4 FINISHING."
         df = pd.read_excel(filestream, sheet_name=sheet_name, header=0)
         
-        st.session_state.date = df[['Activity Name', 'Start', 'Finish']].head().iloc[1:2]
+        st.session_state.date = df[['Activity Name', 'Start', 'Finish']].head().iloc[1:2] 
+        st.session_state.towername = "Tower 4"
         
         expected_columns = [
             'Module', 'Floor', 'Flat', 'Domain', 'Activity ID', 'Activity Name', 
@@ -211,6 +213,7 @@ def find_max_positive_repeated_activities(days_diff_df):
            
             output_df = pd.DataFrame({
                 'SNo': range(1, len(result_df) + 1),
+                'Tower Name':st.session_state.towername,
                 'Activity Name': result_df['Activity Name'],
                 'DelayDays': result_df['Days Difference'],
                 'DelayReasons': '',  
@@ -227,34 +230,33 @@ def find_max_positive_repeated_activities(days_diff_df):
 def create_excel_file(df):
     wb = Workbook()
     ws = wb.active
-    ws.title = "Time Delay"
+    ws.title = "Repeated Activities"
     
-    # Define headers
-    headers = ['SNo', 'Activity Name', 'Time Delay', 'DelayReasons', 'Remarks']
+    # Add title in the first row
+    title = f"Time Delay Report({datetime.now().strftime('%Y-%m-%d')})"
+    ws.cell(row=1, column=1).value = title
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=5)  # Merge across 5 columns
+    ws.cell(row=1, column=1).font = Font(bold=True, size=14)
+    ws.cell(row=1, column=1).alignment = Alignment(horizontal="center")
+    
+    # Define headers in the second row
+    headers = ['SNo', 'Activity Name', 'DelayDays', 'DelayReasons', 'Remarks']
     for col_idx, header in enumerate(headers, start=1):
-        cell = ws.cell(row=1, column=col_idx)
+        cell = ws.cell(row=2, column=col_idx)
         cell.value = header
         cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
         cell.font = Font(bold=True)
         cell.alignment = Alignment(horizontal="center")
     
-    # Add data
-    for row_idx, row in enumerate(df.values, start=2):
+    # Add data starting from the third row
+    for row_idx, row in enumerate(df.values, start=3):
         for col_idx, value in enumerate(row, start=1):
             ws.cell(row=row_idx, column=col_idx).value = value
     
-    # Adjust column widths
-    for col in ws.columns:
-        max_length = 0
-        column = col[0].column_letter
-        for cell in col:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(str(cell.value))
-            except:
-                pass
-        adjusted_width = max_length + 2
-        ws.column_dimensions[column].width = adjusted_width
+    # Adjust column widths for better readability
+    column_widths = {'A': 8, 'B': 20, 'C': 12, 'D': 30, 'E': 30}
+    for column, width in column_widths.items():
+        ws.column_dimensions[column].width = width
     
     # Save to BytesIO
     buffer = io.BytesIO()
