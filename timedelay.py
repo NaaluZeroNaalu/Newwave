@@ -161,7 +161,7 @@ def compute_finish_days_difference(current_df, stored_df):
         
         # Merge DataFrames on 'Activity ID' (inner join to include only matching IDs)
         merged_df = pd.merge(
-            current_df[['Activity ID', 'Finish']],
+            current_df[['Activity ID', 'Activity Name','Finish']],
             stored_df[['Activity ID', 'Finish']],
             on='Activity ID',
             how='inner',
@@ -172,9 +172,94 @@ def compute_finish_days_difference(current_df, stored_df):
         merged_df['Days Difference'] = (merged_df['Finish_current'] - merged_df['Finish_stored']).dt.days
         
         # Select relevant columns
-        result_df = merged_df[['Activity ID', 'Days Difference']]
+        result_df = merged_df[['Activity ID', 'Activity Name','Days Difference']]
         return result_df
-    return pd.DataFrame(columns=['Activity ID', 'Days Difference'])
+    return pd.DataFrame(columns=['Activity ID', 'Activity Name', 'Days Difference'])
+
+
+def find_max_positive_repeated_activities(days_diff_df):
+    if days_diff_df is not None and not days_diff_df.empty:
+        # Filter for positive Days Difference
+        positive_df = days_diff_df[days_diff_df['Days Difference'] > 0]
+        
+        if positive_df.empty:
+            return pd.DataFrame(columns=['SNo', 'Activity Name', 'DelayDays', 'DelayReasons', 'Remarks'])
+        
+        # Find Activity Names that are repeated (appear more than once)
+        activity_counts = positive_df['Activity Name'].value_counts()
+        repeated_activities = activity_counts[activity_counts > 1].index
+        
+        if not repeated_activities.empty:
+            # Filter for repeated Activity Names
+            repeated_df = positive_df[positive_df['Activity Name'].isin(repeated_activities)]
+            
+            # Group by Activity Name and find the maximum Days Difference
+            max_values = repeated_df.groupby('Activity Name')['Days Difference'].max().reset_index()
+            
+            # Merge to get all rows where Days Difference equals the maximum
+            result_df = pd.merge(
+                repeated_df,
+                max_values,
+                on=['Activity Name', 'Days Difference'],
+                how='inner'
+            )
+            
+           
+            result_df = result_df.sort_values(by=['Activity Name', 'Days Difference'], ascending=[True, False])
+            
+           
+            output_df = pd.DataFrame({
+                'SNo': range(1, len(result_df) + 1),
+                'Activity Name': result_df['Activity Name'],
+                'DelayDays': result_df['Days Difference'],
+                'DelayReasons': '',  
+                'Remarks': ''        
+            })
+            
+            return output_df
+        
+   
+    return pd.DataFrame(columns=['SNo', 'Activity Name', 'DelayDays', 'DelayReasons', 'Remarks'])
+
+
+#ithu vanthu excel download panrathukaana code
+def create_excel_file(df):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Time Delay"
+    
+    # Define headers
+    headers = ['SNo', 'Activity Name', 'Time Delay', 'DelayReasons', 'Remarks']
+    for col_idx, header in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col_idx)
+        cell.value = header
+        cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+        cell.font = Font(bold=True)
+        cell.alignment = Alignment(horizontal="center")
+    
+    # Add data
+    for row_idx, row in enumerate(df.values, start=2):
+        for col_idx, value in enumerate(row, start=1):
+            ws.cell(row=row_idx, column=col_idx).value = value
+    
+    # Adjust column widths
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = max_length + 2
+        ws.column_dimensions[column].width = adjusted_width
+    
+    # Save to BytesIO
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    return buffer
 
 # Main logic
 unique_years = []
@@ -228,4 +313,25 @@ if current_tracker and stored_tracker:
         st.write("No matching Activity IDs found between Current and Stored Trackers.")
 else:
     st.write("Please select both Current and Stored Tracker files to compute days difference.")
+
+
+if current_tracker and stored_tracker:
+    days_df = find_max_positive_repeated_activities(days_diff_df)
+    excel_buffer = create_excel_file(days_df)
+    if not days_df.empty:
+        st.write("Max Positive Repeated Activities:")
+        st.write(days_df)
+        st.download_button(
+                label="Time Delay Report",
+                data=excel_buffer,
+                file_name="repeated_activities_delay_report.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="download_repeated_activities"
+            )
+    else:
+        st.write("No max positive repeated activities found.")
+else:
+    st.write("Please select both Current and Stored Tracker files to compute days difference.")
+
+
 
