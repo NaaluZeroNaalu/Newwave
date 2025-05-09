@@ -16,6 +16,7 @@ from ibm_botocore.client import Config
 import io
 from openpyxl import Workbook
 
+
 time_delays_days = []
 
 
@@ -280,58 +281,108 @@ year_filter = st.sidebar.multiselect("Choose Year(s):", unique_years if unique_y
 
 # Process and display current tracker
 if current_tracker:
-    response = st.session_state.cos_client.get_object(Bucket="projectreportnew", Key=current_tracker)
-    file_stream = io.BytesIO(response['Body'].read())
-    workbook = pd.ExcelFile(file_stream, engine="openpyxl")
-    st.session_state.current_tracker = process_file(file_stream, workbook)
-    if st.session_state.current_tracker is not None:
-        filtered_current_df = st.session_state.current_tracker
-        if month_filter:
-            filtered_current_df = filtered_current_df[filtered_current_df['Finish Month'].isin(month_filter)]
-        if year_filter:
-            filtered_current_df = filtered_current_df[filtered_current_df['Finish Year'].isin(year_filter)]
-        st.write("Current Tracker Data:")
-        st.write(filtered_current_df)
+    try:
+        # Retrieve file from IBM COS
+        response = st.session_state.cos_client.get_object(Bucket="projectreportnew", Key=current_tracker)
+        file_stream = io.BytesIO(response['Body'].read())
+        
+        # Process Excel file
+        try:
+            workbook = pd.ExcelFile(file_stream, engine="openpyxl")
+            st.session_state.current_tracker = process_file(file_stream, workbook)
+            
+            if st.session_state.current_tracker is not None:
+                filtered_current_df = st.session_state.current_tracker
+                
+                # Apply month and year filters
+                try:
+                    if month_filter:
+                        if 'Finish Month' not in filtered_current_df.columns:
+                            st.error("Error: 'Finish Month' column missing in Current Tracker.")
+                        else:
+                            filtered_current_df = filtered_current_df[filtered_current_df['Finish Month'].isin(month_filter)]
+                    if year_filter:
+                        if 'Finish Year' not in filtered_current_df.columns:
+                            st.error("Error: 'Finish Year' column missing in Current Tracker.")
+                        else:
+                            filtered_current_df = filtered_current_df[filtered_current_df['Finish Year'].isin(year_filter)]
+                    
+                    st.write("Current Tracker Data:")
+                    st.write(filtered_current_df)
+                except Exception as e:
+                    st.error(f"Error filtering Current Tracker data: {str(e)}")
+            else:
+                st.error("Please Choose a Valid Current Tracker File")
+        except Exception as e:
+            st.error(f"Error reading Current Tracker Excel file: {str(e)}")
+    except Exception as e:
+        st.error(f"Unexpected error with Current Tracker: {str(e)}")
+else:
+    st.warning("Please select a Current Tracker file.")
 
-# Process and display stored tracker
+# Process and display stored tracker (unchanged)
 if stored_tracker:
-    filtered_stored_df = st.session_state.stored_tracker
-    if month_filter:
-        filtered_stored_df = filtered_stored_df[filtered_stored_df['Finish Month'].isin(month_filter)]
-    if year_filter:
-        filtered_stored_df = filtered_stored_df[filtered_stored_df['Finish Year'].isin(year_filter)]
-    st.write("Stored Tracker Data:")
-    st.write(filtered_stored_df)
+    try:
+        filtered_stored_df = st.session_state.stored_tracker
+        
+        try:
+            if month_filter:
+                if 'Finish Month' not in filtered_stored_df.columns:
+                    st.error("Error: 'Finish Month' column missing in Stored Tracker.")
+                else:
+                    filtered_stored_df = filtered_stored_df[filtered_stored_df['Finish Month'].isin(month_filter)]
+            if year_filter:
+                if 'Finish Year' not in filtered_stored_df.columns:
+                    st.error("Error: 'Finish Year' column missing in Stored Tracker.")
+                else:
+                    filtered_stored_df = filtered_stored_df[filtered_stored_df['Finish Year'].isin(year_filter)]
+            
+            st.write("Stored Tracker Data:")
+            st.write(filtered_stored_df)
+        except Exception as e:
+            st.error(f"Error filtering Stored Tracker data: {str(e)}")
+    except Exception as e:
+        st.error(f"Error processing Stored Tracker: {str(e)}")
+else:
+    st.warning("Please select a Stored Tracker file.")
 
 # Compute and display days difference between Finish dates
 if current_tracker and stored_tracker:
-    days_diff_df = compute_finish_days_difference(filtered_current_df, filtered_stored_df)
-    if not days_diff_df.empty:
-        st.write("Days Difference (Current Tracker Finish - Stored Tracker Finish):")
-        st.write(days_diff_df)
-    else:
-        st.write("No matching Activity IDs found between Current and Stored Trackers.")
+    try:
+        days_diff_df = compute_finish_days_difference(filtered_current_df, filtered_stored_df)
+        if not days_diff_df.empty:
+            st.write("Days Difference (Current Tracker Finish - Stored Tracker Finish):")
+            st.write(days_diff_df)
+        else:
+            st.warning("No matching Activity IDs found between Current and Stored Trackers.")
+    except Exception as e:
+        st.error(f"Please Choose a Valid Current Tracker File")
 else:
-    st.write("Please select both Current and Stored Tracker files to compute days difference.")
+    st.warning("Please select both Current and Stored Tracker files to compute days difference.")
 
-
+# Compute and display max positive repeated activities with downloadable Excel
 if current_tracker and stored_tracker:
-    days_df = find_max_positive_repeated_activities(days_diff_df)
-    excel_buffer = create_excel_file(days_df)
-    if not days_df.empty:
-        st.write("Max Positive Repeated Activities:")
-        st.write(days_df)
-        st.download_button(
-                label="Time Delay Report",
-                data=excel_buffer,
-                file_name="repeated_activities_delay_report.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="download_repeated_activities"
-            )
-    else:
-        st.write("No max positive repeated activities found.")
+    try:
+        days_df = find_max_positive_repeated_activities(days_diff_df)
+        if not days_df.empty:
+            st.write("Max Positive Repeated Activities:")
+            st.write(days_df)
+            
+            # Create and provide downloadable Excel file
+            try:
+                excel_buffer = create_excel_file(days_df)
+                st.download_button(
+                    label="Time Delay Report",
+                    data=excel_buffer,
+                    file_name="repeated_activities_delay_report.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="download_repeated_activities"
+                )
+            except Exception as e:
+                st.error(f"Error creating Excel file for download: {str(e)}")
+        else:
+            st.warning("No repeated Activity Names with positive Delay Days found.")
+    except Exception as e:
+        st.error(f"Please Choose a Valid Current Tracker File")
 else:
-    st.write("Please select both Current and Stored Tracker files to compute days difference.")
-
-
-
+    st.warning("Please select both Current and Stored Tracker files to compute repeated activities.")
