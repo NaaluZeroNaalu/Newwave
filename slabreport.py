@@ -332,111 +332,114 @@ def create_excel_file(tables, selected_year):
 files = get_cos_files()    
 
 for file in files:
-    if "Veridia Anti. Slab Cycle With Possesion dates-15th April 2025" in file:
+    if "Veridia/Veridia Anti. Slab Cycle With Possesion dates-(15-05-2025)" in file:
         response = st.session_state.cos_client.get_object(Bucket="projectreportnew", Key=file)
      
 # uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 
-if response:
-    try:
-        # Load Excel workbook
-        
-        wb = load_workbook(BytesIO(response['Body'].read()), data_only=True)
-        sheet_names = wb.sheetnames
-        # sheet_name = st.selectbox("Select a sheet", sheet_names)
-        sheet_name = "Revised baseline with 60d NGT"
-        
-        # Get unique years from the data
-        available_years = get_unique_years(wb, sheet_name)
-        selected_year = st.sidebar.selectbox(
-            "Select Year",
-            options=available_years,
-            index=len(available_years) - 1 if available_years else 0  # Default to the latest year
-        )
-        
-        # Clear previous tables
-        all_tower_tables.clear()
-        
-        # Check if at least one month is selected
-        if selected_month_nums:
-            # Process each tower
-            Tower2(wb, sheet_name, selected_month_nums, selected_year)
-            st.divider()
-            Tower3(wb, sheet_name, selected_month_nums, selected_year)
-            st.divider()
-            Tower4(wb, sheet_name, selected_month_nums, selected_year)
-            st.divider()
-            Tower5(wb, sheet_name, selected_month_nums, selected_year)
-            st.divider()
-            Tower6(wb, sheet_name, selected_month_nums, selected_year)
-            st.divider()
-            Tower7(wb, sheet_name, selected_month_nums, selected_year)
+try:
+    if response:
+        try:
+            # Load Excel workbook
+            
+            wb = load_workbook(BytesIO(response['Body'].read()), data_only=True)
+            sheet_names = wb.sheetnames
+            # sheet_name = st.selectbox("Select a sheet", sheet_names)
+            sheet_name = "Revised baseline with 60d NGT"
+            
+            # Get unique years from the data
+            available_years = get_unique_years(wb, sheet_name)
+            selected_year = st.sidebar.selectbox(
+                "Select Year",
+                options=available_years,
+                index=len(available_years) - 1 if available_years else 0  # Default to the latest year
+            )
+            
+            # Clear previous tables
+            all_tower_tables.clear()
+            
+            # Check if at least one month is selected
+            if selected_month_nums:
+                # Process each tower
+                Tower2(wb, sheet_name, selected_month_nums, selected_year)
+                st.divider()
+                Tower3(wb, sheet_name, selected_month_nums, selected_year)
+                st.divider()
+                Tower4(wb, sheet_name, selected_month_nums, selected_year)
+                st.divider()
+                Tower5(wb, sheet_name, selected_month_nums, selected_year)
+                st.divider()
+                Tower6(wb, sheet_name, selected_month_nums, selected_year)
+                st.divider()
+                Tower7(wb, sheet_name, selected_month_nums, selected_year)
 
-            st.session_state.slabdf = all_tower_tables
-             
-            month_set = set()
-            for tower in all_tower_tables:
-                for entry in tower["table_data"]:
-                    month_set.update(k for k in entry if k not in ["Category", "Total"])
-            months = sorted(month_set)
-
-            completed_data = []
-            non_completed_data = []
-
-            for tower in all_tower_tables:
-                completed_row = {"Tower Name": tower["tower_name"]}
-                non_completed_row = {"Tower Name": tower["tower_name"]}
+                st.session_state.slabdf = all_tower_tables
                 
-                # Initialize values
-                for month in months:
-                    completed_row[month] = 0
-                    non_completed_row[month] = 0
+                month_set = set()
+                for tower in all_tower_tables:
+                    for entry in tower["table_data"]:
+                        month_set.update(k for k in entry if k not in ["Category", "Total"])
+                months = sorted(month_set)
 
-                completed_total = 0
-                non_completed_total = 0
+                completed_data = []
+                non_completed_data = []
 
-                for entry in tower["table_data"]:
-                    if entry["Category"] == "Completed":
-                        for month in months:
-                            completed_row[month] += entry.get(month, 0)
-                        completed_total += int(entry.get("Total", 0))
-                    elif entry["Category"] == "Non-Completed":
-                        for month in months:
-                            non_completed_row[month] += entry.get(month, 0)
-                        non_completed_total += int(entry.get("Total", 0))
+                for tower in all_tower_tables:
+                    completed_row = {"Tower Name": tower["tower_name"]}
+                    non_completed_row = {"Tower Name": tower["tower_name"]}
+                    
+                    # Initialize values
+                    for month in months:
+                        completed_row[month] = 0
+                        non_completed_row[month] = 0
 
-                completed_row["Total"] = completed_total
-                non_completed_row["Total"] = non_completed_total
+                    completed_total = 0
+                    non_completed_total = 0
 
-                completed_data.append(completed_row)
-                non_completed_data.append(non_completed_row)
+                    for entry in tower["table_data"]:
+                        if entry["Category"] == "Completed":
+                            for month in months:
+                                completed_row[month] += entry.get(month, 0)
+                            completed_total += int(entry.get("Total", 0))
+                        elif entry["Category"] == "Non-Completed":
+                            for month in months:
+                                non_completed_row[month] += entry.get(month, 0)
+                            non_completed_total += int(entry.get("Total", 0))
 
-            # Convert to DataFrames
-            df_completed = pd.DataFrame(completed_data)
-            df_non_completed = pd.DataFrame(non_completed_data)
+                    completed_row["Total"] = completed_total
+                    non_completed_row["Total"] = non_completed_total
 
-            # Display in Streamlit
-            st.title("Tower Data - Separated by Category")
+                    completed_data.append(completed_row)
+                    non_completed_data.append(non_completed_row)
 
-            st.subheader("✅ Completed Work")
-            st.dataframe(df_completed)
+                # Convert to DataFrames
+                df_completed = pd.DataFrame(completed_data)
+                df_non_completed = pd.DataFrame(non_completed_data)
 
-            st.subheader("❌ Non-Completed Work")
-            st.dataframe(df_non_completed)
-          
+                # Display in Streamlit
+                st.title("Tower Data - Separated by Category")
+
+                st.subheader("✅ Completed Work")
+                st.dataframe(df_completed)
+
+                st.subheader("❌ Non-Completed Work")
+                st.dataframe(df_non_completed)
+            
 
 
-            # Add download button if tables were generated
-            if all_tower_tables:
-                st.session_state.slab = create_excel_file(all_tower_tables, selected_year)
-                st.download_button(
-                    label="Download All Towers as Excel",
-                    data=st.session_state.slab,
-                    file_name=f"tower_counts_{selected_year}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-        else:
-            st.warning("Please select at least one month to proceed.")
-        
-    except Exception as e:
-        st.error(f"Error reading the Excel file: {e}")
+                # Add download button if tables were generated
+                if all_tower_tables:
+                    st.session_state.slab = create_excel_file(all_tower_tables, selected_year)
+                    st.download_button(
+                        label="Download All Towers as Excel",
+                        data=st.session_state.slab,
+                        file_name=f"tower_counts_{selected_year}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+            else:
+                st.warning("Please select at least one month to proceed.")
+            
+        except Exception as e:
+            st.error(f"Error reading the Excel file: {e}")
+except Exception as e:
+    st.error(f"Slab Report File Not Found")
