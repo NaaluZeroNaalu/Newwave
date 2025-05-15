@@ -235,12 +235,12 @@ def create_excel_file(df):
     # Add title in the first row
     title = f"Time Delay Report({datetime.now().strftime('%Y-%m-%d')})"
     ws.cell(row=1, column=1).value = title
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=5)  # Merge across 5 columns
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=6)  # Merge across 6 columns now
     ws.cell(row=1, column=1).font = Font(bold=True, size=14)
     ws.cell(row=1, column=1).alignment = Alignment(horizontal="center")
     
     # Define headers in the second row
-    headers = ['SNo', 'Activity Name', 'DelayDays', 'DelayReasons', 'Remarks']
+    headers = ['SNo', 'Tower', 'Activity Name', 'Delay Days', 'Delay Reason', 'Remarks']
     for col_idx, header in enumerate(headers, start=1):
         cell = ws.cell(row=2, column=col_idx)
         cell.value = header
@@ -254,7 +254,7 @@ def create_excel_file(df):
             ws.cell(row=row_idx, column=col_idx).value = value
     
     # Adjust column widths for better readability
-    column_widths = {'A': 8, 'B': 20, 'C': 12, 'D': 30, 'E': 30}
+    column_widths = {'A': 8, 'B': 20, 'C': 12, 'D': 15, 'E': 30, 'F': 30}  # Updated for new column
     for column, width in column_widths.items():
         ws.column_dimensions[column].width = width
     
