@@ -1,0 +1,2 @@
+if len(veridia_finishing_4) > 1 or len(eligo_finishing_g) > 1 or len(eligo_finishing_h) > 1 or len(wave_city) > 1 or len(ews_lig_structure) > 1 or len(eligo_structure) > 1 or len(eden_structure) > 1 or len(veridia_structure) > 1:
+        st.write("There are multiple files for the same project. Please check the files and remove duplicates")
