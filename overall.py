@@ -112,15 +112,15 @@ current_year = today.year
 current_month = today.month
 cutoff_day = 10
 
-ews_lig = None
-veridia = None
-eligo = None
-Eden = None
-wave = None
 
 
 def GetOverallreport(files):
-        
+        ews_lig = {}
+        veridia = {}
+        eligo = {}
+        Eden = {}
+        wave = {}
+
         #VERIDIA TOWER 4
         for file in files:
             if file.startswith("Veridia") and "Tower 4 Finishing Tracker" in file:
@@ -207,9 +207,9 @@ def GetOverallreport(files):
                 if all(isinstance(item, dict) for item in data):
                     combined_data.extend(data)
                 else:
-                    st.warning("Skipped some data that wasn't a list of dictionaries.")
+                    st.warning("Some Files Are Missing")
             elif data is not None:
-                st.warning("Skipped invalid data format (expected list of dicts).")
+                st.warning("Some Files Are Missing")
 
         # Now safely create the DataFrame
         if combined_data:
