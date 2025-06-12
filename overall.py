@@ -137,6 +137,24 @@ def GetOverallreport(files):
                 GetTower5Finishing(io.BytesIO(response['Body'].read()))
                 st.write(file,"✅")
 
+        #VERIDIA TOWER 7
+        for file in files:
+            if file.startswith("Veridia") and "Tower 7 Finishing Tracker" in file:
+               
+                response = cos_client.get_object(Bucket="projectreportnew", Key=file)
+                GetTower7Finishing(io.BytesIO(response['Body'].read()))
+                st.write(file,"✅")
+
+
+
+
+
+        for file in files:
+            if file.startswith("Eligo") and "Structure Work Tracker" in file:
+                response = cos_client.get_object(Bucket="projectreportnew", Key=file)
+                eligo = ProcessGandH(io.BytesIO(response['Body'].read()))
+                st.write(file,"✅")
+
     
 
         
@@ -217,6 +235,7 @@ def GetOverallreport(files):
             return df
 
 
+st.header("OVERALL PROJECT REPORT")
 def extract_date(filename):
     # Regex to find date in format dd-mm-yyyy or dd-mm-yyyy in parentheses or after dash
     match = re.search(r'(\d{2})-(\d{2})-(\d{4})', filename)

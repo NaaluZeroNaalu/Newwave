@@ -105,6 +105,19 @@ def GetTower4Finishing(exceldatas):
     except:
         st.session_state.tower4_finishing = "Error While Read Excel"
         st.write("Error While Read Excel")
+
+def GetTower7Finishing(exceldatas):
+
+    try:
+        datas = pd.read_excel(exceldatas, sheet_name='TOWER 7 FINISHING.')
+        # Ai_answer = generatePrompt(datas.head()[['Activity Name', '% Complete']], "Tower 4")
+        # json_data = json.loads(Ai_answer)
+            # st.write(Ai_answer)
+        # st.write(str(int(datas.head()['% Complete'][1] * 100)))
+        st.session_state.tower7_finishing = str(int(datas.head()['% Complete'][1] * 100)) + "%"
+    except:
+        st.session_state.tower7_finishing = "Error While Read Excel"
+        st.write("Error While Read Excel")
     
 def GetTower5Finishing(exceldatas):
     
