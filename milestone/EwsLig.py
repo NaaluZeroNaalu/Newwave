@@ -114,7 +114,7 @@ def generatePrompt(json_datas):
 # def Checkcolor(sheet, )
 
 def EWS1(sheet):
-    st.write("Analyzing Ews Tower 1")
+    # st.write("Analyzing Ews Tower 1")
     rows = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
     cols = ['D', 'H', 'L', 'P']
     flats = ["Pour 1", "Pour 2", "Pour 3", "Pour 4"]
@@ -144,7 +144,7 @@ def EWS1(sheet):
     
 
 def EWS2(sheet):
-    st.write("Analyzing Ews Tower 2")
+    # st.write("Analyzing Ews Tower 2")
     rows = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
     cols = ['U','Y', 'AC', 'AG']
     flats = ["Pour 1", "Pour 2", "Pour 3", "Pour 4"]
@@ -174,7 +174,7 @@ def EWS2(sheet):
    
 
 def EWS3(sheet):
-    st.write("Analyzing Ews Tower 3")
+    # st.write("Analyzing Ews Tower 3")
     rows = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
     cols = ['AL', 'AP', 'AT', 'AX']
     flats = ["Pour 1", "Pour 2", "Pour 3", "Pour 4"]
@@ -202,7 +202,7 @@ def EWS3(sheet):
    
 
 def LIG1(sheet):
-    st.write("Analyzing Lig Tower 1")
+    # st.write("Analyzing Lig Tower 1")
     rows = [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
     cols = ['AL', 'AP', 'AT', 'AX']
     flats = ["Pour 1", "Pour 2", "Pour 3", "Pour 4"]
@@ -233,7 +233,7 @@ def LIG1(sheet):
     
 
 def LIG2(sheet):
-    st.write("Analyzing Lig Tower 2")
+    # st.write("Analyzing Lig Tower 2")
     rows = [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
     cols = ['U','Y', 'AC','AG']
     flats = ["Pour 1", "Pour 2", "Pour 3", "Pour 4"]
@@ -262,7 +262,7 @@ def LIG2(sheet):
             
 
 def LIG3(sheet):
-    st.write("Analyzing Lig Tower 3")
+    # st.write("Analyzing Lig Tower 3")
     rows = [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
     cols = ['D', 'H', 'L', 'P']
     flats = ["Pour 1", "Pour 2", "Pour 3", "Pour 4"]

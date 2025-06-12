@@ -166,7 +166,7 @@ if st.session_state.tower4df.empty:
     for file in files:
     
         try:
-            if file.startswith("Veridia") and "Tower 5 Finishing Tracker" in file:
+            if file.startswith("Veridia") and "Tower 5 Finishing Tracker" in file and month_year in file:
             
                 st.write("✅ Current month:", file)
                 response = cos_client.get_object(Bucket="projectreportnew", Key=file)
@@ -183,7 +183,7 @@ if st.session_state.tower4df.empty:
     for file in files:
         
         try:
-            if file.startswith("Veridia") and "Tower 4 Finishing Tracker" in file:
+            if file.startswith("Veridia") and "Tower 4 Finishing Tracker" in file and prev_month_year in file:
             
                 st.write("✅ Current month:", file)
                 response = cos_client.get_object(Bucket="projectreportnew", Key=file)

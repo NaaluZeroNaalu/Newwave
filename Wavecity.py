@@ -99,8 +99,8 @@ def GetWaveCity(exceldatas):
 
     try:
         datas = pd.read_excel(exceldatas, sheet_name='MSP Progress',header=1)
-        # st.write(datas.head()['% Complete'][0])
-        return [{"Project":"Wave City Club","Tower Name":"Wave City","Structure":str(round(datas.head()['% Complete'][0])) + "%","Finishing":"0%"}]
+        # st.write(str(datas.head()['% Complete'][0]).split(".")[1])
+        return [{"Project":"Wave City Club","Tower Name":"Wave City","Structure":str(datas.head()['% Complete'][0]) + "%","Finishing":"0%"}]
         # st.session_state.wavecity_finishing = 
     except Exception as e:
         # st.session_state.tower4_finishing = "Error While Read Excel"

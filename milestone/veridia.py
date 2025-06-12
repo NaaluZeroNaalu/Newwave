@@ -122,7 +122,7 @@ def generatePrompt(json_datas):
 
 
 def Tower2(sheet):
-    st.write("Analyzing Veridia Tower 2")
+    # st.write("Analyzing Veridia Tower 2")
     rows = [3, 4, 5, 6, 7, 9, 10, 12, 14, 15, 16, 17, 19, 20]
     cols = ['B', 'D', 'F', 'H', 'J', 'L', 'N', 'P']
     current_flat = ""  # Initialize current_flat
@@ -165,7 +165,7 @@ def Tower2(sheet):
 
 
 def Tower3(sheet):
-    st.write("Analyzing Veridia Tower 3")
+    # st.write("Analyzing Veridia Tower 3")
     rows = [3, 4, 5, 6, 7, 9, 10, 14, 15, 16, 17, 19, 20]
     cols = ['T', 'V', 'X', 'Z', 'AB', 'AD', 'AF', 'AH']
     current_flat = ""  # Initialize current_flat
@@ -219,7 +219,7 @@ def Tower3(sheet):
     #             tower3.append(0)
 
 def Tower4(sheet):
-    st.write("Analyzing Veridia Tower 4")
+    # st.write("Analyzing Veridia Tower 4")
     rows = [3, 4, 5, 6, 7, 9, 10, 14, 15, 16, 17, 19, 20]
     cols = ['AL', 'AN', 'AP', 'AR', 'AT', 'AV', 'AX', 'AZ', 'BB', 'BD', 'BF', 'BH', 'BJ', 'BL', 'BN', 'BP']
     
@@ -260,7 +260,7 @@ def Tower4(sheet):
                 
 
 def Tower5(sheet):
-    st.write("Analyzing Veridia Tower 5")
+    # st.write("Analyzing Veridia Tower 5")
     rows = [3, 4, 5, 6, 7, 9, 10, 14, 15, 16, 17, 19, 20]
     cols = ['DC', 'DE', 'DG', 'DI', 'DK', 'DM', 'DO', 'DQ', 'DS', 'DU', 'DW', 'DY', 'EA', 'EC']
     current_flat = ""  # Initialize current_flat
@@ -300,7 +300,7 @@ def Tower5(sheet):
                 
 
 def Tower6(sheet):
-    st.write("Analyzing Veridia Tower 6")
+    # st.write("Analyzing Veridia Tower 6")
     rows = [3, 4, 5, 6, 7, 9, 10, 14, 15, 16, 17, 19, 20]
     cols = ['FK', 'FM', 'FO', 'FQ', 'FS', 'FU', 'FW', 'FY',  'GA', 'GC', 'GE', 'GG', 'GI', "GK"]
     current_flat = ""  # Initialize current_flat
@@ -340,7 +340,7 @@ def Tower6(sheet):
                 
 
 def Tower7(sheet):
-    st.write("Analyzing Veridia Tower 7")
+    # st.write("Analyzing Veridia Tower 7")
 
     rows = [3, 4, 5, 6, 7, 9, 10, 14, 15, 16, 17, 19, 20]
     cols = ['EG', 'EI', 'EK', 'EM', 'EO', 'EQ', 'ES', 'EU', 'EW', 'EY', 'FA', 'FC', 'FE', 'FG']

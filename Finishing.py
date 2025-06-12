@@ -101,7 +101,7 @@ def GetTower4Finishing(exceldatas):
         # json_data = json.loads(Ai_answer)
             # st.write(Ai_answer)
         # st.write(datas.head()['% Complete'][1])
-        st.session_state.tower4_finishing = str(datas.head()['% Complete'][1]) + "%"
+        st.session_state.tower4_finishing = str(int(datas.head()['% Complete'][1] * 100)) + "%"
     except:
         st.session_state.tower4_finishing = "Error While Read Excel"
         st.write("Error While Read Excel")
@@ -112,9 +112,10 @@ def GetTower5Finishing(exceldatas):
         datas = pd.read_excel(exceldatas, sheet_name='TOWER 5 FINISHING.')
         # Ai_answer = generatePrompt(datas.head(2)[['Activity Name', '% Complete']], "Tower 5")
         # st.write(Ai_answer)
+        st.write(str(int(datas.head(2)['% Complete'][1] * 100)))
         # json_data = json.loads(Ai_answer)
         # st.write(datas.head(2)['% Complete'][1])
-        st.session_state.tower5_finishing = str(datas.head(2)['% Complete'][1]) + "%"
+        st.session_state.tower5_finishing = str(int(datas.head(2)['% Complete'][1] * 100)) + "%"
     except:
         st.session_state.tower5_finishing = "Error When Generating Prompt"
         st.write("Error When Generating Prompt")
@@ -129,7 +130,7 @@ def GetTowerGFinishing(exceldatas):
         # st.write(Ai_answer)
         # json_data = json.loads(Ai_answer)
         # st.write(datas.head()[['Activity Name', '% Complete']])
-        st.session_state.towerg_finishing = str(datas.head()['% Complete'][1]) + "%"
+        st.session_state.towerg_finishing = str(int(datas.head()['% Complete'][1] * 100)) + "%"
     except:
         st.session_state.towerg_finishing = "Error When Read Excel"
         st.write("Error When Read Excel")
@@ -143,7 +144,7 @@ def GetTowerHFinishing(exceldatas):
         # Ai_answer = generatePrompt(datas.head(2)[['Activity Name', '% Complete']], "Tower H")
         # st.write(Ai_answer)
         # json_data = json.loads(Ai_answer)
-        st.session_state.towerh_finishing = str(datas.head()['% Complete'][1]) + "%"
+        st.session_state.towerh_finishing = str(int(datas.head()['% Complete'][1] * 100)) + "%"
     except:
         st.session_state.towerh_finishing = "Error When Read Excel"
         st.write("Error When Read Excel")

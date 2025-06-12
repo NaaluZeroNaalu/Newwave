@@ -102,6 +102,8 @@ def get_percentages(exceldatas):
             # Aianswer = generatePrompt(datas.head()[selected_columns],i)
             # json_data = json.loads(Aianswer)
             # st.write(Aianswer)
+            # st.write(i)
+            # st.write(str(datas.iloc[rows[count]][selected_columns][0]).split(".")[1])
             eden.append({
                 "Project":"Eden",
                 "Tower Name":i,

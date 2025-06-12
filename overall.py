@@ -331,7 +331,7 @@ if len(files_before_10th) > 0:
     # st.write(files_before_10th)
         with st.form("my_form"):
             st.info("Multiple Previous Files Found Please Select a files to continue")
-            selected_files = st.multiselect("Choose a Files",files_before_10th)
+            selected_files = st.multiselect("Choose a Files",files)
             # Every form must have a submit button.
             submitted = st.form_submit_button("Continue",type="primary",use_container_width=True)
             if submitted:
@@ -344,9 +344,10 @@ if len(files_before_10th) > 0:
             # st.write(df)
                 excel_data = to_excel(st.session_state.overalldf)
                 st.session_state.overall = excel_data
+
                 st.title("Tower Project Status Table")
 
-                # st.dataframe(df)
+                st.dataframe(st.session_state.overalldf)
 
                 st.download_button(
                     label="Download as Excel",

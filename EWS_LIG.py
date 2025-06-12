@@ -128,7 +128,11 @@ def EWS1(sheet):
                 bg_color = f"#{fill.start_color.rgb[-6:]}"  # Extract the last 6 chars for hex color
             else:
                 bg_color = "#FFFFFF"  # Default to white if no background color is set
-    
+
+            # st.write(value)
+            # st.write(f"row:{ row}, col:{col}")
+            # st.write(bg_color)
+            # st.divider()
             if bg_color == "#92D050":
                 ews1.append(1)
             else:
@@ -276,11 +280,17 @@ def ProcessEWSLIG(exceldatas):
     sheet = wb[sheet_name]
 
    
+   
     EWS1(sheet)
+   
     EWS2(sheet)
+    
     EWS3(sheet)
+    
     LIG1(sheet)
+   
     LIG2(sheet)
+   
     LIG3(sheet)
 
     data = {

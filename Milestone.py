@@ -218,10 +218,10 @@ else:
 if missing_sources:
     st.warning(f"Missing Tow Files from: {', '.join(missing_sources)}")
 else:
-    st.success("All JSON sources were loaded successfully.")
+    st.success("All Datas loaded successfully.")
 
 df = pd.DataFrame(combined_json)
-st.write(df)
+# st.write(df)
 df['date'] = pd.to_datetime(df['date'])
 
 
@@ -253,10 +253,10 @@ selected_months = [reverse_month_map[m] for m in selected_month_names]
 
 filtered_df = df[(df['year'] == selected_year) & (df['month'].isin(selected_months))]
 
-st.write(filtered_df)
+# st.write(filtered_df)
 
 json_data = filtered_df.to_json(orient='records')
-st.write(json_data)
+# st.write(json_data)
 
 def process_json_data(json_data):
     # """
@@ -286,7 +286,7 @@ def process_json_data(json_data):
     st.write(df['date_clean'])
     # Get unique months from the data and sort them
     unique_months = sorted(df['date_clean'].dt.month.unique())
-    st.write(unique_months)
+    # st.write(unique_months)
     month_names = []
     month_mapping = {
         1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
