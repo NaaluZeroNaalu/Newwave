@@ -107,7 +107,7 @@ def get_percentages(exceldatas):
             eden.append({
                 "Project":"Eden",
                 "Tower Name":i,
-                "Structure":str(datas.iloc[rows[count]][selected_columns][0]) + "%",
+                "Structure":str(int(datas.iloc[rows[count]][selected_columns][0] * 100))  + "%",
                 "Finishing":"0%"
             })
             count += 1

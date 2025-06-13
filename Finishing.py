@@ -125,7 +125,7 @@ def GetTower5Finishing(exceldatas):
         datas = pd.read_excel(exceldatas, sheet_name='TOWER 5 FINISHING.')
         # Ai_answer = generatePrompt(datas.head(2)[['Activity Name', '% Complete']], "Tower 5")
         # st.write(Ai_answer)
-        st.write(str(int(datas.head(2)['% Complete'][1] * 100)))
+        # st.write(str(int(datas.head(2)['% Complete'][1] * 100)))
         # json_data = json.loads(Ai_answer)
         # st.write(datas.head(2)['% Complete'][1])
         st.session_state.tower5_finishing = str(int(datas.head(2)['% Complete'][1] * 100)) + "%"

@@ -28,28 +28,28 @@ import re
 
 
 if 'tower2_finishing' not in st.session_state:
-    st.session_state.tower2_finishing = 0
+    st.session_state.tower2_finishing = "0%"
 if 'tower3_finishing' not in st.session_state:
-    st.session_state.tower3_finishing = 0
+    st.session_state.tower3_finishing = "0%"
 if 'tower4_finishing' not in st.session_state:
-    st.session_state.tower4_finishing = 0
+    st.session_state.tower4_finishing = "0%"
 if 'tower5_finishing' not in st.session_state:
-    st.session_state.tower5_finishing = 0
+    st.session_state.tower5_finishing = "0%"
 if 'tower6_finishing' not in st.session_state:
-    st.session_state.tower6_finishing = 0
+    st.session_state.tower6_finishing = "0%"
 if 'tower7_finishing' not in st.session_state:
-    st.session_state.tower7_finishing = 0
+    st.session_state.tower7_finishing = "0%"
 
 
 if 'towerf_finishing' not in st.session_state:
-    st.session_state.towerf_finishing = 0
+    st.session_state.towerf_finishing = "0%"
 if 'towerg_finishing' not in st.session_state:
-    st.session_state.towerg_finishing = 0
+    st.session_state.towerg_finishing = "0%"
 if 'towerh_finishing' not in st.session_state:
-    st.session_state.towerh_finishing = 0
+    st.session_state.towerh_finishing = "0%"
 
-if 'towerh_finishing' not in st.session_state:
-    st.session_state.wavecity_finishing = 0
+if 'wavecity_finishing' not in st.session_state:
+    st.session_state.wavecity_finishing = "0%"
 
 COS_API_KEY = "ehl6KMyT95fwzKf7sPW_X3eKFppy_24xbm4P1Yk-jqyU"
 COS_SERVICE_INSTANCE_ID = "crn:v1:bluemix:public:cloud-object-storage:global:a/fddc2a92db904306b413ed706665c2ff:e99c3906-0103-4257-bcba-e455e7ced9b7:bucket:projectreportnew"
@@ -102,10 +102,12 @@ def get_cos_files():
         return files
     except Exception as e:
         print(f"Error fetching COS files: {e}")
-        return ["Error fetching COS files"]
+        return ["Error fetching COS files",e]
     
 files = get_cos_files()
-st.write(files)
+# files = ["Error fetching COS files","Something Error"]
+# files = ["EWS LIG P4/Structure Work Tracker (31-05-2025).xlsx", "Eden/Structure Work Tracker (31-05-2025).xlsx", "Eligo/Structure Work Tracker (31-05-2025).xlsx", "Eligo/Tower G Finishing Tracker (01-06-2025).xlsx", "Eligo/Tower H Finishing Tracker (01-06-2025).xlsx", "Veridia/Structure Work Tracker (31-05-2025).xlsx", "Veridia/Tower 4 Finishing Tracker (13-05-2025).xlsx", "Veridia/Tower 5 Finishing Tracker (01-06-2025).xlsx", "Veridia/Tower 7 Finishing Tracker (01-06-2025).xlsx", "Wave City Club/Structure Work Tracker Wave City Club all Block (11-06-2025).xlsx"]
+# st.write(files)
 
 today = datetime.today()
 current_year = today.year
@@ -247,21 +249,24 @@ def extract_date(filename):
 files_before_10th = []
 files_after_or_on_10th = []
 
-for f in files:
-    file_date = extract_date(f)
-    if file_date:
-        # Filter for current month and year only
-        if file_date.year == current_year and file_date.month == current_month:
-            if file_date.day < cutoff_day:
-                files_before_10th.append(f)
+if files[0] == "Error fetching COS files":
+    st.write("")
+else:
+    for f in files:
+        file_date = extract_date(f)
+        if file_date:
+            # Filter for current month and year only
+            if file_date.year == current_year and file_date.month == current_month:
+                if file_date.day < cutoff_day:
+                    files_before_10th.append(f)
+                else:
+                    files_after_or_on_10th.append(f)
             else:
-                files_after_or_on_10th.append(f)
+                # For files not in current month/year, treat as before 10th
+                files_before_10th.append(f)
         else:
-            # For files not in current month/year, treat as before 10th
-            files_before_10th.append(f)
-    else:
-        # If no date found, skip or decide where to put
-        pass
+            # If no date found, skip or decide where to put
+            pass
 
 # st.write("Files BEFORE 10th June 2025:")
 # for file in files_before_10th:
@@ -270,6 +275,10 @@ for f in files:
 # st.write("\nFiles ON or AFTER 10th June 2025:")
 # for file in files_after_or_on_10th:
 #     st.write(file)
+
+
+st.info(f"Previous Month Files:{len(files_before_10th)}")
+st.success(f"Current Month Files:{len(files_after_or_on_10th)}")
 
 veridia_finishing_4 = []
 veridia_finishing_5 = []
@@ -343,30 +352,52 @@ def seperatefiles(files):
                 veridia_structure.append(file)
 
 
-if len(files_before_10th) > 0:
-    seperatefiles(files)
-    if len(veridia_finishing_4) > 1 or len(eligo_finishing_g) > 1 or len(eligo_finishing_h) > 1 or len(wave_city) > 1 or len(ews_lig_structure) > 1 or len(eligo_structure) > 1 or len(eden_structure) > 1 or len(veridia_structure) > 1:
-        st.warning("There are multiple files for the same project. Please check the files and remove duplicates")
-    # st.write(files_before_10th)
-        with st.form("my_form"):
-            st.info("Multiple Previous Files Found Please Select a files to continue")
-            selected_files = st.multiselect("Choose a Files",files)
-            # Every form must have a submit button.
-            submitted = st.form_submit_button("Continue",type="primary",use_container_width=True)
-            if submitted:
-                # st.write(selected_files)
-                st.session_state.overalldf = GetOverallreport(selected_files)
-                st.session_state.check = True
-                
+if files[0] == "Error fetching COS files":
+    st.warning(files[1])     
+else:
+    if len(files_before_10th) > 0:
+        seperatefiles(files)
+        if len(veridia_finishing_4) > 1 or len(eligo_finishing_g) > 1 or len(eligo_finishing_h) > 1 or len(wave_city) > 1 or len(ews_lig_structure) > 1 or len(eligo_structure) > 1 or len(eden_structure) > 1 or len(veridia_structure) > 1:
+            st.warning("There are multiple files for the same project. Please check the files and remove duplicates")
+        # st.write(files_before_10th)
+            with st.form("my_form"):
+                st.info("Multiple Previous Files Found Please Select a files to continue")
+                selected_files = st.multiselect("Choose a Files",files)
+                # Every form must have a submit button.
+                submitted = st.form_submit_button("Continue",type="primary",use_container_width=True)
+                if submitted:
+                    # st.write(selected_files)
+                    st.session_state.overalldf = GetOverallreport(selected_files)
+                    st.session_state.check = True
+                    
+            if st.session_state.check:
+                if st.session_state.overalldf is not None and not st.session_state.overalldf.empty:
+                # st.write(df)
+                    excel_data = to_excel(st.session_state.overalldf)
+                    st.session_state.overall = excel_data
+
+                    st.title("Tower Project Status Table")
+
+                    st.dataframe(st.session_state.overalldf)
+
+                    st.download_button(
+                        label="Download as Excel",
+                        data=excel_data,
+                        file_name="Overall_Project_Report.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+    else:
+        st.session_state.overalldf = GetOverallreport(files)
+        st.session_state.check = True
         if st.session_state.check:
             if st.session_state.overalldf is not None and not st.session_state.overalldf.empty:
+                st.dataframe(st.session_state.overalldf)
             # st.write(df)
                 excel_data = to_excel(st.session_state.overalldf)
                 st.session_state.overall = excel_data
-
                 st.title("Tower Project Status Table")
 
-                st.dataframe(st.session_state.overalldf)
+                # st.dataframe(df)
 
                 st.download_button(
                     label="Download as Excel",
@@ -374,25 +405,7 @@ if len(files_before_10th) > 0:
                     file_name="Overall_Project_Report.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-else:
-    st.session_state.overalldf = GetOverallreport(files)
-    st.session_state.check = True
-    if st.session_state.check:
-        if st.session_state.overalldf is not None and not st.session_state.overalldf.empty:
-        # st.write(df)
-            excel_data = to_excel(st.session_state.overalldf)
-            st.session_state.overall = excel_data
-            st.title("Tower Project Status Table")
-
-            # st.dataframe(df)
-
-            st.download_button(
-                label="Download as Excel",
-                data=excel_data,
-                file_name="Overall_Project_Report.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-                    
+                   
 
       
 
