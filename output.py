@@ -12,7 +12,7 @@ pages = {
         # st.Page("test.py",title="test",icon=":material/home:"),
         # st.Page("Milestone.py",title="Milestone",icon=":material/home:"),
         # st.Page("MilestoneFinishing.py",title="MilestoneFinishing",icon=":material/home:"),
-        # st.Page("download.py",title="Download",icon=":material/home:"),
+        st.Page("download.py",title="Download",icon=":material/home:"),
 
     ]
 }

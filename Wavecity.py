@@ -3,8 +3,8 @@ import pandas as pd
 import requests
 import json
 import time
-
-
+import math
+import numpy as np
 
 
 
@@ -95,12 +95,61 @@ def generatePrompt(datas, tower):
 
 
 
+
 def GetWaveCity(exceldatas):
 
     try:
         datas = pd.read_excel(exceldatas, sheet_name='MSP Progress',header=1)
-        # st.write(str(datas.head()['% Complete'][0]).split(".")[1])
-        return [{"Project":"Wave City Club","Tower Name":"Wave City","Structure":str(int(datas.head()['% Complete'][0] * 100)) + "%","Finishing":"0%"}]
+        # st.write(datas.head())
+        task_keywords = [
+            "Wave City Club Start-finish ",
+            "Block 1 (B1) Banquet Hall",
+            "Block 6 (B6) Toilets",
+            "Block 7(B7) Indoor Sports",
+            "Block 9 (B9) Spa & Saloon",
+            "Block 8 (B8) Squash Court",
+            "Block 2 & 3 (B2 & B3) Cafe & Bar",
+            "Block 4 (B4) Indoor Swimming Pool Changing Room & Toilets",
+            "Block 11 (B11) Guest House",
+            "Block 10 (B10) Gym",
+            "Block 5 (B5) Admin + Member Lounge+Creche+Av Room + Surveillance Room +Toilets"
+        ]
+
+        def match_task(row):
+            for keyword in task_keywords:
+                if keyword in str(row):
+                    return keyword
+            return None
+        
+        datas['Matched Task'] = datas['Task Name'].apply(match_task)
+        filtered_data = datas.dropna(subset=['Matched Task'])
+
+        # Compute average % Complete
+        result = (
+            filtered_data
+            .groupby('Matched Task')['% Complete']
+            .mean()
+            .reset_index()
+        )
+
+        # Multiply to convert to percentage and format with %
+        # result['% Complete'] = (result['% Complete'] * 100).round(1).astype(str) + "%"
+        result['% Complete'] = np.ceil(result['% Complete'] * 100).astype(int).astype(str) + "%"
+
+        # Build the JSON format
+        json_data = [
+            {
+                "Project": "Wave City Club",
+                "Tower Name": row['Matched Task'],
+                "Structure": row['% Complete'],
+                "Finishing": "0%"
+            }
+            for _, row in result.iterrows()
+        ]
+
+        # st.json(json_data)
+
+        return json_data
         # st.session_state.wavecity_finishing = 
     except Exception as e:
         # st.session_state.tower4_finishing = "Error While Read Excel"

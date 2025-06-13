@@ -125,7 +125,7 @@ def TowerF(sheet):
                 # st.write(f"Cell {col}{row} color: {color}, value: {cell.value}")
                 if color == "FF92D050":
                     towerf.append(1)
-                else:
+                if color == "FF00B0F0":
                     towerf.append(0)
             else:
                 st.write(f"Cell {col}{row} has no solid fill color, value: {cell.value}")
@@ -144,7 +144,7 @@ def TowerG(sheet):
                 # st.write(f"Cell {col}{row} color: {color}, value: {cell.value}")
                 if color == "FF92D050":
                     towerg.append(1)
-                else:
+                if color == "FF00B0F0":
                     towerg.append(0)
             else:
                 st.write(f"Cell {col}{row} has no solid fill color, value: {cell.value}")
@@ -163,7 +163,7 @@ def TowerH(sheet):
                 # st.write(f"Cell {col}{row} color: {color}, value: {cell.value}")
                 if color == "FF92D050":
                     towerh.append(1)
-                else:
+                if color == "FF00B0F0":
                     towerh.append(0)
             else:
                 st.write(f"Cell {col}{row} has no solid fill color, value: {cell.value}")
@@ -180,7 +180,7 @@ def Processjson(data):
     data["Finishing"]
 ):
         total = green + non_green
-        structure = f"{(green / total * 100):.2f}%" if total > 0 else "0.00%"
+        structure = f"{math.ceil(green / total * 100)}%" if total > 0 else "0.00%"
         
         entry = {
             "Project": project,
@@ -201,6 +201,9 @@ def ProcessGandH(exceldatas):
     sheet_name = "Revised Baselines- 25 days SC"
 
     sheet = wb[sheet_name]
+    towerf.clear()
+    towerg.clear()
+    towerh.clear()
     #Revised Baselines- 25 days SC
     TowerF(sheet)
     TowerG(sheet)
@@ -219,17 +222,13 @@ def ProcessGandH(exceldatas):
      # Calculate average percentage of green
     green_counts = data["Green (1)"]
     non_green_counts = data["Non-Green (0)"]
-    averages = []
 
-    for green, non_green in zip(green_counts, non_green_counts):
-        total = green + non_green
-        avg = (green / total) * 100 if total > 0 else 0  # avoids division by zero
-        averages.append(avg)
-
-    data["Structure"] = data["Average (%)"] = [f"{(green / (green + non_green) * 100):.2f}%" if (green + non_green) > 0 else "0.00%"
-                       for green, non_green in zip(green_counts, non_green_counts)]
-    
-    # st.table(data)
+    # Add Structure column with rounded percentages
+    data["Structure"] = [f"{round(green / (green + non_green) * 100)}%" if (green + non_green) > 0 else "0%"
+                        for green, non_green in zip(green_counts, non_green_counts)]
+        
+    # st.write("ELIGO")
+    # st.dataframe(data)
     # df = pd.DataFrame(data)
     json_data = Processjson(data)
     return json_data

@@ -135,7 +135,7 @@ def EWS1(sheet):
             # st.divider()
             if bg_color == "#92D050":
                 ews1.append(1)
-            else:
+            if bg_color == "#0070C0":
                 ews1.append(0)
 
 def EWS2(sheet):
@@ -156,7 +156,7 @@ def EWS2(sheet):
     
             if bg_color == "#92D050":
                 ews2.append(1)
-            else:
+            if bg_color == "#0070C0":
                 ews2.append(0)
 
 def EWS3(sheet):
@@ -177,7 +177,7 @@ def EWS3(sheet):
     
             if bg_color == "#92D050":
                 ews3.append(1)
-            else:
+            if bg_color == "#0070C0":
                 ews3.append(0)
 
 
@@ -200,7 +200,7 @@ def LIG1(sheet):
             
             if bg_color == "#92D050":
                 lig1.append(1)
-            else:
+            if bg_color == "#0070C0":
                 lig1.append(0)
     
 
@@ -222,7 +222,7 @@ def LIG2(sheet):
 
             if bg_color == "#92D050":
                 lig2.append(1)
-            else:
+            if bg_color == "#0070C0":
                 lig2.append(0)
     
 
@@ -244,7 +244,7 @@ def LIG3(sheet):
 
             if bg_color == "#92D050":
                 lig3.append(1)
-            else:
+            if bg_color == "#0070C0":
                 lig3.append(0)
 
 def Processjson(data):
@@ -257,7 +257,7 @@ def Processjson(data):
     data["Finishing"]
 ):
         total = green + non_green
-        structure = f"{(green / total * 100):.2f}%" if total > 0 else "0.00%"
+        structure = f"{math.ceil(green / total * 100)}%" if total > 0 else "0%"
         
         entry = {
             "Project": project,
@@ -279,7 +279,12 @@ def ProcessEWSLIG(exceldatas):
 
     sheet = wb[sheet_name]
 
-   
+    ews1.clear()
+    ews2.clear()
+    ews3.clear()
+    lig1.clear()
+    lig2.clear()
+    lig3.clear()
    
     EWS1(sheet)
    
@@ -317,7 +322,8 @@ def ProcessEWSLIG(exceldatas):
     json_data = Processjson(data)
     # st.table(data)
     # df = pd.DataFrame(data)
-
+    # st.write("EWS LIG")
+    # st.dataframe(data)
     # Ai_answer = generatePrompt(df)
 
     # json_data = json.loads(Ai_answer)

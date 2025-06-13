@@ -192,12 +192,12 @@ def GetOverallreport(files):
 
     
 
-        #ELIGO TOWER STRUCTURE
-        for file in files:
-            if file.startswith("Eligo") and "Structure Work Tracker" in file:
-                response = cos_client.get_object(Bucket="projectreportnew", Key=file)
-                eligo = ProcessGandH(io.BytesIO(response['Body'].read()))
-                st.write(file,"✅")
+        # #ELIGO TOWER STRUCTURE
+        # for file in files:
+        #     if file.startswith("Eligo") and "Structure Work Tracker" in file:
+        #         response = cos_client.get_object(Bucket="projectreportnew", Key=file)
+        #         eligo = ProcessGandH(io.BytesIO(response['Body'].read()))
+        #         st.write(file,"✅")
 
 
         #EDEN
