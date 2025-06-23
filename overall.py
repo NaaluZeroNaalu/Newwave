@@ -25,6 +25,8 @@ from datetime import date
 import concurrent.futures
 from dateutil.relativedelta import relativedelta
 import re
+from collections import defaultdict
+from dateutil.relativedelta import relativedelta
 
 
 if 'tower2_finishing' not in st.session_state:
@@ -50,6 +52,10 @@ if 'towerh_finishing' not in st.session_state:
 
 if 'wavecity_finishing' not in st.session_state:
     st.session_state.wavecity_finishing = "0%"
+
+# st.session_state.overall
+if 'overalldf' not in st.session_state:
+    st.session_state.overalldf = pd.DataFrame()
 
 COS_API_KEY = "ehl6KMyT95fwzKf7sPW_X3eKFppy_24xbm4P1Yk-jqyU"
 COS_SERVICE_INSTANCE_ID = "crn:v1:bluemix:public:cloud-object-storage:global:a/fddc2a92db904306b413ed706665c2ff:e99c3906-0103-4257-bcba-e455e7ced9b7:bucket:projectreportnew"
@@ -110,13 +116,25 @@ files = get_cos_files()
 # st.write(files)
 
 today = datetime.today()
-current_year = today.year
 current_month = today.month
-cutoff_day = 10
+current_year = today.year
+previous_month_date = today - relativedelta(months=1)
+previous_month = previous_month_date.month
+previous_year = previous_month_date.year
+
+
+def extract_date(file_name):
+    match = re.search(r"\((\d{2}-\d{2}-\d{4})\)", file_name)
+    if match:
+        return datetime.strptime(match.group(1), "%d-%m-%Y")
+    return None
+
 
 
 
 def GetOverallreport(files):
+        
+        # st.session_state.overalldf = pd.DataFrame()
         ews_lig = {}
         veridia = {}
         eligo = {}
@@ -146,20 +164,7 @@ def GetOverallreport(files):
                 response = cos_client.get_object(Bucket="projectreportnew", Key=file)
                 GetTower7Finishing(io.BytesIO(response['Body'].read()))
                 st.write(file,"✅")
-
-
-
-
-
-        for file in files:
-            if file.startswith("Eligo") and "Structure Work Tracker" in file:
-                response = cos_client.get_object(Bucket="projectreportnew", Key=file)
-                eligo = ProcessGandH(io.BytesIO(response['Body'].read()))
-                st.write(file,"✅")
-
     
-
-        
         # #ELIGO TOWER G
         for file in files:
             if file.startswith("Eligo") and "Tower G Finishing Tracker" in file:
@@ -174,6 +179,11 @@ def GetOverallreport(files):
                 GetTowerHFinishing(io.BytesIO(response['Body'].read()))
                 st.write(file,"✅")
 
+        for file in files:
+            if file.startswith("Eligo") and "Structure Work Tracker" in file:
+                response = cos_client.get_object(Bucket="projectreportnew", Key=file)
+                eligo = ProcessGandH(io.BytesIO(response['Body'].read()))
+                st.write(file,"✅")
 
         for file in files:
             #WAVE CITY
@@ -237,176 +247,57 @@ def GetOverallreport(files):
             return df
 
 
-st.header("OVERALL PROJECT REPORT")
-def extract_date(filename):
-    # Regex to find date in format dd-mm-yyyy or dd-mm-yyyy in parentheses or after dash
-    match = re.search(r'(\d{2})-(\d{2})-(\d{4})', filename)
-    if match:
-        day, month, year = map(int, match.groups())
-        return datetime(year, month, day)
-    return None
+# Group by project and subcategory (e.g. "Structure Work Tracker", "Tower G Finishing Tracker")
+project_map = defaultdict(lambda: {"current": [], "previous": []})
 
-files_before_10th = []
-files_after_or_on_10th = []
+for file in files:
+    parts = file.split('/')
+    project = parts[0]
+    sub_path = '/'.join(parts[1:])  # handles nested folders
+    file_date = extract_date(file)
 
-if files[0] == "Error fetching COS files":
-    st.write("")
-else:
-    for f in files:
-        file_date = extract_date(f)
-        if file_date:
-            # Filter for current month and year only
-            if file_date.year == current_year and file_date.month == current_month:
-                if file_date.day < cutoff_day:
-                    files_before_10th.append(f)
-                else:
-                    files_after_or_on_10th.append(f)
-            else:
-                # For files not in current month/year, treat as before 10th
-                files_before_10th.append(f)
-        else:
-            # If no date found, skip or decide where to put
-            pass
+    if not file_date:
+        continue
 
-# st.write("Files BEFORE 10th June 2025:")
-# for file in files_before_10th:
-#     st.write(file)
-
-# st.write("\nFiles ON or AFTER 10th June 2025:")
-# for file in files_after_or_on_10th:
-#     st.write(file)
-
-
-st.info(f"Previous Month Files:{len(files_before_10th)}")
-st.success(f"Current Month Files:{len(files_after_or_on_10th)}")
-
-veridia_finishing_4 = []
-veridia_finishing_5 = []
-eligo_finishing_g = []
-eligo_finishing_h = []
-wave_city = []
-ews_lig_structure = []
-eligo_structure = []
-eden_structure = []
-veridia_structure = []
-
-if 'overall' not in st.session_state:
-    st.session_state.overall = None
-
-if 'overalldf' not in st.session_state:
-    st.session_state.overalldf = None
-
-if 'check' not in st.session_state:
-    st.session_state.check = False
-
-def seperatefiles(files):
-        
-        #VERIDIA TOWER 4
-        for file in files_before_10th:
-            if file.startswith("Veridia") and "Tower 4 Finishing Tracker" in file:
-                veridia_finishing_4.append(file)
-
-        #VERIDIA TOWER 4
-        for file in files_before_10th:
-            if file.startswith("Veridia") and "Tower 5 Finishing Tracker" in file:
-                veridia_finishing_5.append(file)
-
-        
-        #ELIGO TOWER G
-        for file in files_before_10th:
-            if file.startswith("Eligo") and "Tower G Finishing Tracker" in file:
-                eligo_finishing_g.append(file)
-
-        #ELIGO TOWER H
-        for file in files_before_10th:
-            if file.startswith("Eligo") and "Tower H Finishing Tracker" in file:
-                eligo_finishing_h.append(file)
-
-        for file in files_before_10th:
-            #WAVE CITY
-            if file.startswith("Wave City Club") and "Structure Work Tracker Wave City Club all Block" in file:
-                wave_city.append(file)
-
-        # EWS LIG
-        for file in files_before_10th:
-            if file.startswith("EWS LIG") and "Structure Work Tracker" in file:
-                ews_lig_structure.append(file)
-
+    key = f"{project}/{sub_path.split('(')[0].strip()}"  # e.g., "Eligo/Tower G Finishing Tracker"
     
+    if file_date.year == current_year and file_date.month == current_month:
+        project_map[key]["current"].append(file)
+    elif file_date.year == previous_year and file_date.month == previous_month:
+        project_map[key]["previous"].append(file)
 
-        #ELIGO TOWER STRUCTURE
-        for file in files_before_10th:
-            if file.startswith("Eligo") and "Structure Work Tracker" in file:
-                eligo_structure.append(file)
+# Final list of selected files
+selected_files = []
 
-        #EDEN
-        for file in files_before_10th:
-            if file.startswith("Eden") and "Structure Work Tracker" in file:
-                eden_structure.append(file)
+for key, month_files in project_map.items():
+    if month_files["current"]:
+        selected_files.extend(month_files["current"])
+    elif month_files["previous"]:
+        selected_files.extend(month_files["previous"])
 
 
-       
-        # #VERIDIA TOWER 4
-        for file in files_before_10th:
-            if file.startswith("Veridia") and "Structure Work Tracker" in file:
-                veridia_structure.append(file)
-
+st.header("OVERALL PROJECT REPORT")
+st.write(selected_files)
 
 if files[0] == "Error fetching COS files":
-    st.warning(files[1])     
+    st.warning(files[1])    
 else:
-    if len(files_before_10th) > 0:
-        seperatefiles(files)
-        if len(veridia_finishing_4) > 1 or len(eligo_finishing_g) > 1 or len(eligo_finishing_h) > 1 or len(wave_city) > 1 or len(ews_lig_structure) > 1 or len(eligo_structure) > 1 or len(eden_structure) > 1 or len(veridia_structure) > 1:
-            st.warning("There are multiple files for the same project. Please check the files and remove duplicates")
-        # st.write(files_before_10th)
-            with st.form("my_form"):
-                st.info("Multiple Previous Files Found Please Select a files to continue")
-                selected_files = st.multiselect("Choose a Files",files)
-                # Every form must have a submit button.
-                submitted = st.form_submit_button("Continue",type="primary",use_container_width=True)
-                if submitted:
-                    # st.write(selected_files)
-                    st.session_state.overalldf = GetOverallreport(selected_files)
-                    st.session_state.check = True
-                    
-            if st.session_state.check:
-                if st.session_state.overalldf is not None and not st.session_state.overalldf.empty:
-                # st.write(df)
-                    excel_data = to_excel(st.session_state.overalldf)
-                    st.session_state.overall = excel_data
+    st.session_state.overalldf = GetOverallreport(selected_files)
+    st.session_state.overalldf = st.session_state.overalldf.drop_duplicates(subset='Tower Name')
+    st.session_state.check = True
+    if st.session_state.check:
+        if st.session_state.overalldf is not None and not st.session_state.overalldf.empty:
+            st.title("Tower Project Status Table")
+            st.dataframe(st.session_state.overalldf)
+        # st.write(df)
+            excel_data = to_excel(st.session_state.overalldf)
+            st.session_state.overall = excel_data
 
-                    st.title("Tower Project Status Table")
+            # st.dataframe(df)
 
-                    st.dataframe(st.session_state.overalldf)
-
-                    st.download_button(
-                        label="Download as Excel",
-                        data=excel_data,
-                        file_name="Overall_Project_Report.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-    else:
-        st.session_state.overalldf = GetOverallreport(files)
-        st.session_state.check = True
-        if st.session_state.check:
-            if st.session_state.overalldf is not None and not st.session_state.overalldf.empty:
-                st.dataframe(st.session_state.overalldf)
-            # st.write(df)
-                excel_data = to_excel(st.session_state.overalldf)
-                st.session_state.overall = excel_data
-                st.title("Tower Project Status Table")
-
-                # st.dataframe(df)
-
-                st.download_button(
-                    label="Download as Excel",
-                    data=excel_data,
-                    file_name="Overall_Project_Report.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-                   
-
-      
-
-        
+            st.download_button(
+                label="Download as Excel",
+                data=excel_data,
+                file_name="Overall_Project_Report.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )

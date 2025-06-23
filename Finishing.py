@@ -139,6 +139,7 @@ def GetTowerGFinishing(exceldatas):
     try:
         datas = pd.read_excel(exceldatas, sheet_name='Tower G Finishing')
         # st.write(datas.head()[['Activity Name', '% Complete']])
+        # st.write(int(datas.head()['% Complete'][1] * 100))
         # Ai_answer = generatePrompt(datas.head()[['Activity Name', '% Complete']], "Tower G")
         # st.write(Ai_answer)
         # json_data = json.loads(Ai_answer)

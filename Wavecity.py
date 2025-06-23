@@ -112,7 +112,8 @@ def GetWaveCity(exceldatas):
             "Block 4 (B4) Indoor Swimming Pool Changing Room & Toilets",
             "Block 11 (B11) Guest House",
             "Block 10 (B10) Gym",
-            "Block 5 (B5) Admin + Member Lounge+Creche+Av Room + Surveillance Room +Toilets"
+            "Block 5 (B5) Admin + Member Lounge+Creche+Av Room + Surveillance Room +Toilets",
+            "Fine Dine"
         ]
 
         def match_task(row):
@@ -131,10 +132,10 @@ def GetWaveCity(exceldatas):
             .mean()
             .reset_index()
         )
-
+        # st.write(result)
         # Multiply to convert to percentage and format with %
         # result['% Complete'] = (result['% Complete'] * 100).round(1).astype(str) + "%"
-        result['% Complete'] = np.ceil(result['% Complete'] * 100).astype(int).astype(str) + "%"
+        result['% Complete'] = np.round(result['% Complete'] * 100).astype(int).astype(str) + "%"
 
         # Build the JSON format
         json_data = [
@@ -146,6 +147,7 @@ def GetWaveCity(exceldatas):
             }
             for _, row in result.iterrows()
         ]
+        # st.dataframe(json_data)
 
         # st.json(json_data)
 

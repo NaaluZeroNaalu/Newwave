@@ -1,0 +1,51 @@
+What is Tokenization
+Tokenizer-nu solrathu, text-ai model-ku puriyura numbers-a (tokens) maathura process. Machine-kku “words” puriyaathu — so we need to convert text → numbers.
+
+ Why is it needed?
+ Ithu oru string (characters), but LLM-ku train panna, namma ithai vector or number format-la kodukkanum.
+
+ Toknizer JOB
+ Break down the sentence into tokens (either words, subwords, or even characters)
+ Convert them into IDs (integers)
+
+ Eg:
+
+ "Vanakkam enakku kavithai"
+ ["Vanakkam", "enakku", "kavithai"]
+[124, 456, 789]
+
+
+Subword Tokenization (like BPE)
+
+Byte Pair Encoding (BPE) → splits rare/long words into known sub-parts.
+"VanakkamEnakkuKavithai" → ["Van", "akkam", "E", "nak", "ku", "Kavi", "thai"]
+
+******************************TOKENIZATIONS***********************************
+
+******************************EMBEDDING LAYER*********************************
+
+What is Embedding?
+Embedding is a way to convert each token ID (integer) into a dense vector (list of floating-point numbers).
+
+Eg: Token ID 12 → Vector like [0.12, -0.05, 0.33, ...]
+
+These vectors capture semantic meaning and relationships between tokens.
+
+
+Why Embedding?
+Machine learning models work better with continuous numeric vectors, not just integers.
+
+Embeddings allow the model to understand similarity between words/tokens.
+
+For example, tokens like "king" and "queen" will have vectors that are close in the embedding space.
+
+
+How does embedding layer work?
+Input: Token IDs from tokenizer (e.g. [12, 23, 5, 18])
+
+Embedding matrix: A big matrix of size (vocab_size, embedding_dim) — say (10000, 768)
+
+Lookup: For each token ID, fetch the corresponding row (vector) from the matrix
+
+Output: A sequence of vectors representing the input tokens
+******************************EMBEDDING LAYER*********************************

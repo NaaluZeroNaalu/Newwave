@@ -219,6 +219,7 @@ def ProcessGandH(exceldatas):
     "Non-Green (0)": [towerf.count(0), towerg.count(0), towerh.count(0)],
     "Finishing":[st.session_state.towerf_finishing,st.session_state.towerg_finishing,st.session_state.towerh_finishing]
 }
+    
      # Calculate average percentage of green
     green_counts = data["Green (1)"]
     non_green_counts = data["Non-Green (0)"]

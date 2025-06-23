@@ -328,7 +328,7 @@ def ProcessVeridia(exceldatas):
     green_counts = data["Green (1)"]
     non_green_counts = data["Non-Green (0)"]
     averages = []
-    st.dataframe(data)
+    # st.dataframe(data)
     for green, non_green in zip(green_counts, non_green_counts):
         total = green + non_green
         avg = (green / total) * 100 if total > 0 else 0  # avoids division by zero
@@ -338,4 +338,5 @@ def ProcessVeridia(exceldatas):
                        for green, non_green in zip(green_counts, non_green_counts)]
 
     json_data = Processjson(data)
+    # st.write(json_data)
     return json_data
