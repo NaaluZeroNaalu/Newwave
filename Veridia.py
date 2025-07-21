@@ -209,7 +209,7 @@ def Tower4(sheet):
 def Tower5(sheet):
    
     rows = [4, 5, 6, 7, 9, 10, 14, 15, 16, 17, 19, 20]
-    cols = ['DC', 'DE', 'DG', 'DI', 'DK', 'DM', 'DO', 'DQ', 'DS', 'DU', 'DW', 'DY', 'EA', 'EC']
+    cols = ['DE', 'DI', 'DM', 'DQ', 'DU', 'DY', 'EC']
 
     for row in rows:
         for col in cols:
@@ -217,12 +217,13 @@ def Tower5(sheet):
             fill = cell.fill
             if fill.fill_type == "solid" and fill.start_color:
                 color = fill.start_color.rgb  # Get RGB color code
-                # st.write(f"Cell {col}{row} color: {color}, value: {cell.value}")
+                st.write(f"Cell {col}{row} color: {color}, value: {cell.value}")
                 if color == "FF92D050":
                     tower5.append(1)
                 if color == "FF00B0F0":
                     tower5.append(0)
             else:
+                tower5.append(0)
                 st.write(f"Cell {col}{row} has no solid fill color, value: {cell.value}")
                 
 
@@ -323,12 +324,12 @@ def ProcessVeridia(exceldatas):
     "Non-Green (0)": [tower2.count(0), tower3.count(0), tower4.count(0), tower5.count(0), tower6.count(0), tower7.count(0)],
     "Finishing":[st.session_state.tower2_finishing,st.session_state.tower3_finishing,st.session_state.tower4_finishing,st.session_state.tower5_finishing,st.session_state.tower6_finishing,st.session_state.tower7_finishing]
 }
-    # st.write("Veridia")
-    # st.table(data)
+    st.write("Veridia")
+    st.table(data)
     green_counts = data["Green (1)"]
     non_green_counts = data["Non-Green (0)"]
     averages = []
-    # st.dataframe(data)
+    st.dataframe(data)
     for green, non_green in zip(green_counts, non_green_counts):
         total = green + non_green
         avg = (green / total) * 100 if total > 0 else 0  # avoids division by zero
